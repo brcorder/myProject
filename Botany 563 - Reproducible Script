@@ -1,0 +1,54 @@
+#Reproducible Script (Copy):
+MAFFT:
+# INPUT: unaligned matrix in .fasta (or other?), exported from Geneious
+# Open Ubuntu
+cd /mnt/c/Users/…/
+# Change file directory to wherever the FASTA matrix is
+mafft
+# Entering the above will prompt you to enter in the input and output file names, the order of the output, and the alignment method. The below code is the finalized sum of this at the end:
+command=
+/usr/bin/mafft"  --retree 2 --phylipout --reorder "Burmannia_CDS_UNALIGNED.fasta" > "Burmannia_CDS_ALIGNED”
+# PARAMETERS: output format = #5 (phylip format / sorted) and strategy = #3 (FFT-NS-2 – default)
+# OUTPUT: a phylip file with your aligned matrix, to export to Geneious or Seaview
+
+jModelTest:
+# INPUT: aligned matrix in .phy format, the output from mafft
+# DEPENDENCIES: phyML must be installed
+# --- File > Load DNA Alignment
+# --- Analysis > Compute Likelihood Scores
+# OUTPUT: Likelihood scores for 88 models are calculated
+# --- Analysis > Do AIC calculations
+# PARAMETERS: AICc (AIC correction, for number of sites; = ~90,000 here)
+# OUTPUT: Table of AICc values; sort by deltaAICc to find one that = 0, for the best model
+
+# Best model reproduced below (from jModelTest output):
+phyml  -i C:\Users\brand\...\jmodeltest7755855895568538885.phy -d nt -n 1 -b 0 --run_id GTR+G -m 012345 -f m -c 4 -a e --no_memory_check -o tlr -s NNI
+
+PAUP*:
+# To import an aligned matrix, in .NEX file:
+# --- File > Open [file]
+# .NEX file can be created in Geneious (> Export > File type .nex)
+# By default, outgroup will be the first taxon in the .nex file, which isn’t usually what we want, unless we made the .nex file by hand. To set an outgroup for this dataset:
+paup> OUTGROUP ‘T._leontopetaloides’
+# OUTPUT: Outgroup status changed: 1 taxon transferred to outgroup; total number of taxa now in outgroup = 1, number of ingroup taxa = 6
+# To run a heuristic search with parsimony:
+paup> hsearch addSeq=random;
+# (or go to >Analysis >Parsimony > Heuristic Search
+# PARAMETERS: Default settings except: 10 random replicates, hold 1 tree at each step, swapping algorithm = TBR (from Lam et al., 2018)
+# OUTPUT: Total rearrangements tried = 833, Score of best tree = 49153, number of trees retained = 1; times hit = 10
+# OUTPUT: an MP tree with no bootstrap values, with the above outgroup
+# To add bootstrap values (thank you to Robert Fitzpatrick):
+paup> BOOTSTRAP nreps=100 conlevel=50 grpfreq=yes keepall=yes brlens=yes treefile=bootstrap100.trees replace=yes search=heuristic / addseq=random nreps=50 nchuck=1000 chuckscore=1;
+# OUTPUT: 100 bootstrapped trees with >50 confidence level, keeping all trees, exported to a treefile
+# To save the consensus tree with bootstrap values from the above:
+paup> SAVETREES from=1 to=1 file=bootstrap_consensus.tree savebootp=nodelabels;
+# OUTPUT: consensus tree file with bootstrap values as node labels
+
+RAxML-HPC2 on XCEDE (CIPRES):
+# INPUT: aligned .fasta file from MAFFT
+# DEPENDENCIES: Log-on to CIPRES, upload file to folders prior to starting
+# --- Toolkit > RAxML-HPC2 on XCEDE
+# PARAMETERS: Input: select input data from your folder
+# PARAMETERS: Tool (already selected if you go through ToolKit)
+# PARAMETERS: Input parameters: Maximum hours to run (0.5 hours worked for this run); set name for outfiles (optional, “result” by default); enter number of patterns (this can be found in the output for some earlier steps; here it was ~1600); select data type = nucleotides; outgroup = T._leontopetaloides; estimate proportion of invariable sites = no (from jModelTest result); set model = GTRGAMMA
+# OUTPUT = several tree files, one of which has bootstraps as a label
