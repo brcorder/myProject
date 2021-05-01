@@ -1,6 +1,17 @@
-#Reproducible Script (Copy):
+#Reproducible Script for Botany 563 Final Project
+# by Brandon Corder
+# Pipeline for analysis of molecular data with RAxML and PAUP
+# DEPENDENCIES: this project uses Geneious Prime, MAFFT, jModelTest, PAUP*, and assumes access to CIPRES (RAxML)
+# DEPENDENCIES: additional dependencies include Java Runtime Environment, phyML (for PAUP), Ubuntu (for MAFFT)
+# OTHER PROGRAMS: I also variously used Seaview, FigTree, or R (PhyloTools), but ultimately they were synonymous with the capabilities of Geneious Prime so that is used below.
+
+GENEIOUS PRIME:
+# Download sequences in GenBank format from NCBI or another database
+# Drag and drop into Geneious Prime; import as a joined list
+# Able to export as a .fasta for next step (> Export As...)
+
 MAFFT:
-# INPUT: unaligned matrix in .fasta (or other?), exported from Geneious
+# INPUT: unaligned matrix in .fasta (or other?), exported from Geneious Prime
 # Open Ubuntu
 cd /mnt/c/Users/…/
 # Change file directory to wherever the FASTA matrix is
